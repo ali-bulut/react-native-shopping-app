@@ -7,7 +7,7 @@ import CartItem from "../../components/shop/CartItem";
 import { removeFromCart } from "../../store/actions/cart";
 import { addOrder } from "../../store/actions/order";
 
-const CartScreen = () => {
+const CartScreen = (props) => {
   const cartTotalAmount = useSelector((state) => state.cart.totalAmount);
 
   //replacing object to an array
@@ -40,6 +40,8 @@ const CartScreen = () => {
           disabled={cartItems.length === 0}
           onPress={() => {
               dispatch(addOrder(cartItems, cartTotalAmount))
+              props.navigation.navigate('ProductsOverview')
+              props.navigation.navigate('Orders')
           }}
         />
       </View>
