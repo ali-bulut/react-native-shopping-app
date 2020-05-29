@@ -8,11 +8,13 @@ import {
   Platform,
 } from "react-native";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import CustomHeaderButton from "../../components/UI/CustomHeaderButton";
+import * as productsActions from "../../store/actions/products";
 
 const EditProductScreen = (props) => {
+  const dispatch = useDispatch();
   const productId = props.navigation.getParam("productId");
   const editedProduct = useSelector((state) =>
     state.products.userProducts.find((p) => p.id === productId)
@@ -27,9 +29,17 @@ const EditProductScreen = (props) => {
     editedProduct ? editedProduct.description : ""
   );
 
+  
+
   const submitHandler = useCallback(() => {
-    console.log("Submitting!");
-  }, []);
+    if (editedProduct) {
+        dispatch(productsActions.updateProduct(productId, title, description, imageUrl))
+    }else{
+        // + -> convert string to a number
+        dispatch(productsActions.createProduct(title, description, imageUrl, +price))
+    }
+    props.navigation.goBack();
+  }, [dispatch, productId, title, description, imageUrl, price]);
 
   useEffect(() => {
     props.navigation.setParams({ submit: submitHandler });
@@ -81,7 +91,7 @@ const EditProductScreen = (props) => {
 };
 
 EditProductScreen.navigationOptions = (navData) => {
-    const submitHandler = navData.navigation.getParam('submit');
+  const submitHandler = navData.navigation.getParam("submit");
   return {
     title: navData.navigation.getParam("productId")
       ? "Edit Product"
