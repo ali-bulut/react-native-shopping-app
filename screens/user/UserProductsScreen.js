@@ -9,9 +9,14 @@ import Colors from '../../constants/Colors';
 import { deleteProduct } from "../../store/actions/products";
 
 
-const UserProductsScreen = () => {
+const UserProductsScreen = (props) => {
   const userProducts = useSelector((state) => state.products.userProducts);
   const dispatch = useDispatch();
+
+    const editProductHandler = (productId) => {
+        props.navigation.navigate('EditProduct', {productId});
+    }
+
   return (
     <FlatList
       data={userProducts}
@@ -21,12 +26,15 @@ const UserProductsScreen = () => {
           image={itemData.item.imageUrl}
           title={itemData.item.title}
           price={itemData.item.price}
-          onSelect={() => {}}
+          onSelect={() => {
+            editProductHandler(itemData.item.id)
+          }}
         >
             <Button
                 color={Colors.primary}
                 title="Edit"
                 onPress={() => {
+                    editProductHandler(itemData.item.id)
                 }}
               />
               <Button
@@ -55,7 +63,19 @@ UserProductsScreen.navigationOptions = (navData) => {
           }}
         />
       </HeaderButtons>
-    )
+    ),
+    headerRight: () => (
+        <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+          <Item
+            title="Add"
+            iconName={Platform.OS === "android" ? "md-add" : "ios-add"}
+            iconSize={23}
+            onPress={() => {
+              navData.navigation.navigate('EditProduct');
+            }}
+          />
+        </HeaderButtons>
+      )
   };
 };
 
