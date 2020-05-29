@@ -83,8 +83,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily:'open-sans-bold',
-    fontSize: 18,
-    marginVertical: 2,
+    fontSize: 18
   },
   price: {
     fontFamily:'open-sans',
