@@ -28,11 +28,27 @@ const ProductsOverviewScreen = (props) => {
     dispatch(fetchProducts()).then(() => setIsLoading(false)).catch(err => setError(err.message));
   }, [dispatch, setIsLoading, setError])
 
+
+  useEffect(() => {
+    //for exm: you changed a product's information. And you came to all products screen from admin screen.
+    //Normally you cannot see your changes when you came to all products screen. Because when you change screens
+    // from sidedrawer you actually dont load the screen again. So we have to reload screen. We reload it 
+    //by using this listener.
+    const willFocusSub = props.navigation.addListener('willFocus', loadProducts)
+
+    //when the component rerender or destroyed, this will work.
+    return () => {
+      willFocusSub.remove();
+    }
+
+  }, [loadProducts])
+
   useEffect(() => {
     setIsLoading(true);
     // dispatch(fetchProducts()).then(() => setIsLoading(false)).catch(err => setError(err.message));
     loadProducts();
   }, [loadProducts]);
+
 
   const selectItemHandler = (id, title) => {
     props.navigation.navigate({
