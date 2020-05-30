@@ -19,14 +19,21 @@ import { fetchProducts } from "../../store/actions/products";
 
 const ProductsOverviewScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState();
   const products = useSelector((state) => state.products.availableProducts);
   const dispatch = useDispatch();
 
-  const loadProducts = useCallback(() => {
-    setError();
-    dispatch(fetchProducts()).then(() => setIsLoading(false)).catch(err => setError(err.message));
-  }, [dispatch, setIsLoading, setError])
+  const loadProducts = useCallback(async () => {
+    setError(null);
+    setIsRefreshing(true);
+    try {
+      await dispatch(fetchProducts());
+    } catch (err) {
+      setError(err.message);
+    }
+    setIsRefreshing(false);
+  }, [dispatch, setError])
 
 
   useEffect(() => {
@@ -46,7 +53,7 @@ const ProductsOverviewScreen = (props) => {
   useEffect(() => {
     setIsLoading(true);
     // dispatch(fetchProducts()).then(() => setIsLoading(false)).catch(err => setError(err.message));
-    loadProducts();
+    loadProducts().then(() => setIsLoading(false));
   }, [loadProducts]);
 
 
@@ -84,6 +91,8 @@ const ProductsOverviewScreen = (props) => {
 
   return (
     <FlatList
+      onRefresh={loadProducts}
+      refreshing={isRefreshing}
       data={products}
       keyExtractor={(item) => item.id}
       renderItem={(itemData) => (
