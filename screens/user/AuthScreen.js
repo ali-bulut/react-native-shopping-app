@@ -1,10 +1,12 @@
-import React, { useReducer, useCallback, useState } from "react";
+import React, { useReducer, useEffect, useCallback, useState } from "react";
 import {
   ScrollView,
   KeyboardAvoidingView,
   StyleSheet,
   Button,
   View,
+  ActivityIndicator,
+  Alert
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useDispatch } from "react-redux";
@@ -17,7 +19,6 @@ import { signup, login } from "../../store/actions/auth";
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
 const formReducer = (state, action) => {
-
   if (action.type === FORM_INPUT_UPDATE) {
     const updatedValues = {
       ...state.inputValues,
@@ -43,8 +44,9 @@ const formReducer = (state, action) => {
 };
 
 const AuthScreen = (props) => {
-
-    const [isSignup, setIsSignup]= useState(false);
+  const [isSignup, setIsSignup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
 
   const dispatch = useDispatch();
 
@@ -60,14 +62,33 @@ const AuthScreen = (props) => {
     formIsValid: false,
   });
 
-  const authHandler = () => {
-     let action;
-      if(isSignup){
-        action = signup(formState.inputValues.email, formState.inputValues.password);
-      }else{
-        action = login(formState.inputValues.email, formState.inputValues.password);
+  useEffect(() => {
+      if(error){
+          Alert.alert('An error occured!', error, [{text:'Okay'}])
       }
-      dispatch(action);
+  }, [error])
+
+  const authHandler = async() => {
+    let action;
+    if (isSignup) {
+      action = signup(
+        formState.inputValues.email,
+        formState.inputValues.password
+      );
+    } else {
+      action = login(
+        formState.inputValues.email,
+        formState.inputValues.password
+      );
+    }
+    setError(null);
+    setIsLoading(true);
+    try {
+        await dispatch(action);
+    } catch (err) {
+        setError(err.message)
+    }
+    setIsLoading(false);
   };
 
   const inputChangeHandler = useCallback(
@@ -116,14 +137,18 @@ const AuthScreen = (props) => {
               initialValue=""
             />
             <View style={styles.buttonContainer}>
-              <Button title={isSignup ? "Sign Up" : "Login"} color={Colors.primary} onPress={authHandler} />
+            {isLoading ? <ActivityIndicator size="small" color={Colors.primary} /> : <Button
+                title={isSignup ? "Sign Up" : "Login"}
+                color={Colors.primary}
+                onPress={authHandler}
+              />}
             </View>
             <View style={styles.buttonContainer}>
-              <Button
-                title={`Switch to ${isSignup ? 'Login' : 'Sign Up'}`}
+               <Button
+                title={`Switch to ${isSignup ? "Login" : "Sign Up"}`}
                 color={Colors.secondary}
                 onPress={() => {
-                    setIsSignup(prevState => !prevState)
+                  setIsSignup((prevState) => !prevState);
                 }}
               />
             </View>
