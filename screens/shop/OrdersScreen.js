@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import { FlatList, Text, Platform } from "react-native";
+import { FlatList, Text, Platform, View } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 
@@ -14,6 +14,12 @@ const OrdersScreen = (props) => {
   useEffect(() => {
     dispatch(fetchOrders())
   }, [dispatch])
+
+  if(orders.length === 0){
+    return <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+      <Text>No orders found, maybe start ordering some products?</Text>
+    </View>
+  }
 
   return (
     <FlatList

@@ -31,11 +31,13 @@ export const signup = (email, password) => {
         throw new Error(message);
     }
 
-    const resData = response.json();
-
-    dispatch({
-      type: SIGNUP,
-    });
+    response.json().then(resData => {
+        dispatch({
+            type: LOGIN,
+            token: resData.idToken,
+            userId: resData.localId
+          });
+      });
   };
 };
 
@@ -70,10 +72,14 @@ export const login = (email, password) => {
           throw new Error(message);
       }
   
-      const resData = response.json();
-  
-      dispatch({
-        type: LOGIN,
+      response.json().then(resData => {
+        dispatch({
+            type: LOGIN,
+            token: resData.idToken,
+            userId: resData.localId
+          });
       });
+  
+      
     };
   };
