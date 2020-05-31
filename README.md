@@ -1,2 +1,2 @@
 # react-native-shopping-app
-A mobile shopping app with Navigation by using React Native
+A mobile advanced shopping app by using React Native and Google Firebase
